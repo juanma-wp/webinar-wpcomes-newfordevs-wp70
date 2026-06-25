@@ -1,8 +1,9 @@
 # What's New for Devs in WP 7.0 — AI Demos
 
 A live-demo WordPress plugin for the **"WordPress 7.0: Novedades para desarrollo"** webinar.
-It showcases the **WordPress 7.0 AI Building Blocks** and is meant to grow: it starts with one
-working example (a Content Summarizer) and is structured so more AI examples can be added.
+It showcases new **WordPress 7.0** developer features and is meant to grow. It currently bundles
+two demos: an AI **Content Summarizer** (built on the AI Building Blocks) and a **PHP-only block**
+registered with no JavaScript ([see below](#php-only-block-registered-with-no-javascript)).
 
 The AI Building Blocks demonstrated:
 
@@ -50,6 +51,8 @@ For live development: `npm start` (rebuilds on change).
 | `webinar-wpcomes-newfordevs-wp70.php` | Bootstrap; bails if not on WP 7.0; loads `includes/`. |
 | `includes/summarizer.php` | Registers the ability category + `wp-ai-workshop/summarization` ability (schemas, permission, `execute_callback` calling the PHP AI Client), and enqueues the editor **script module**. |
 | `src/index.js` | Editor UI; calls `executeAbility( 'wp-ai-workshop/summarization', { content, length } )` from `@wordpress/abilities`. |
+| `includes/recent-posts-block.php` | The PHP-only block (`webinar-wp70/recent-posts`) — see the section below. |
+| `assets/recent-posts.css` | Styles for that block, enqueued on `enqueue_block_assets`. |
 
 The ability is registered with `meta.show_in_rest = true` (auto-creates a REST endpoint) and
 `meta.mcp.public = true` (opts into the MCP server), so the **same** ability is callable from the
@@ -68,6 +71,54 @@ The upstream "section 4" variant calls the same ability over REST with `apiFetch
 `/wp-abilities/v1/abilities/wp-ai-workshop/summarization/run` instead of the `@wordpress/abilities`
 client. It's a more conservative build (classic script enqueue) and useful as a fallback or to
 contrast the two approaches.
+
+## PHP-only block (registered with no JavaScript)
+
+The plugin also ships a second, AI-independent demo: a block registered **entirely in PHP** — no
+`block.json`, no JavaScript, no build step — using WordPress 7.0's new `autoRegister` support.
+`includes/recent-posts-block.php` registers `webinar-wp70/recent-posts`, which server-renders a
+list of recent posts.
+
+```php
+register_block_type(
+	'webinar-wp70/recent-posts',
+	array(
+		'title'           => __( 'Recent Posts (PHP)', 'wp-ai-workshop' ),
+		'attributes'      => array(
+			// numberOfPosts (integer), order (enum), showDate (boolean)
+		),
+		'render_callback' => 'wp_ai_workshop_render_recent_posts_block',
+		'supports'        => array( 'autoRegister' => true ),
+	)
+);
+```
+
+**What's new in 7.0 is just one line:** `'supports' => array( 'autoRegister' => true )`. Everything
+else (`register_block_type`, `render_callback`, `attributes`) already existed. That single flag —
+paired with a `render_callback` — tells core to do everything that previously required a separate
+client-side JavaScript registration:
+
+- the block appears in the **inserter** automatically;
+- it gets an editor preview via **ServerSideRender** (no `edit` function to write);
+- its **Inspector controls are generated from the PHP `attributes` schema** — `enum` → select,
+  `integer` → number, `boolean` → checkbox, each captioned by the attribute's `label`.
+
+Because it renders in PHP, the output is **dynamic** — re-queried on every load, which is exactly
+the use case server-rendered blocks are for. The data is site-global (not tied to the current
+post), so it also renders **live in the editor preview**, and adjusting the controls (number of
+posts, order, show date) updates that preview immediately.
+
+> Note: auto-registered blocks render in the editor *without* the current post in context, so a
+> block that depends on the post being edited (e.g. reading time) can only show real values on the
+> published page. Site-global data like this avoids that limitation.
+
+**Limitations (by design, this iteration):** no inner blocks, no custom React `edit` UI (the editor
+shows the ServerSideRender preview), and a small attribute-type set (`string` / `integer` /
+`boolean` / `string`+`enum`; no media). Reach for a JavaScript-built block when you need inner
+blocks or a rich editing experience.
+
+> Under the hood, core exposes these blocks to the editor via a `window.__unstableAutoRegisterBlocks`
+> global — the `__unstable` prefix is a reminder the API is still early-stage.
 
 ## Roadmap
 

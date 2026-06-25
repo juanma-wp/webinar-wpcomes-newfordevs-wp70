@@ -23,5 +23,10 @@ if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 	return;
 }
 
-// All plugin logic lives in includes/summarizer.php.
+// Content Summarizer example: ability + editor integration via @wordpress/abilities.
 require_once __DIR__ . '/includes/summarizer.php';
+
+// PHP-only block example: a server-rendered "Recent Posts" block, registered
+// entirely in PHP (no block.json, no build). Site-global data, so it renders
+// live in the editor preview too.
+require_once __DIR__ . '/includes/recent-posts-block.php';

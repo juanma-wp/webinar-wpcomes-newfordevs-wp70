@@ -123,7 +123,10 @@ function wp_ai_workshop_execute_summarization( $input ) {
 	// Returning the raw result is fine: a string flows through to the
 	// caller; a WP_Error is surfaced by the Abilities API as a typed REST
 	// error (e.g. `ability_invalid_output`).
-	return wp_ai_client_prompt( $prompt )
+
+	$wp_ai_client_instance = wp_ai_client_prompt( $prompt );
+
+	return $wp_ai_client_instance
 		->using_model_preference( ...$preferred_models )
 		->generate_text();
 }

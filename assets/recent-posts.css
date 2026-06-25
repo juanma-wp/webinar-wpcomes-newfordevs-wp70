@@ -1,0 +1,23 @@
+/**
+ * Styles for the PHP-only "Recent Posts" block (webinar-wp70/recent-posts).
+ *
+ * Loaded on the front end and in the editor canvas via `enqueue_block_assets`,
+ * so the ServerSideRender preview matches the published output.
+ */
+
+.wp-recent-posts {
+	margin: 1rem 0;
+	padding-left: 1.1rem;
+	list-style: square;
+}
+
+.wp-recent-posts__item {
+	margin: 0.25rem 0;
+	line-height: 1.5;
+}
+
+.wp-recent-posts__date {
+	margin-left: 0.4rem;
+	font-size: 0.8em;
+	color: #6b7280;
+}
