@@ -1,5 +1,5 @@
 {
-  "name": "whats-new-for-devs-in-wp-70",
+  "name": "webinar-wpcomes-newfordevs-wp70",
   "version": "0.1.0",
   "description": "Live demo plugin for the \"WordPress 7.0: Novedades para desarrollo\" webinar — showcasing the WordPress 7.0 AI Building Blocks (PHP AI Client, Abilities API, MCP). Starts with a Content Summarizer ability callable from the block editor via @wordpress/abilities.",
   "author": "JuanMa Garrido",

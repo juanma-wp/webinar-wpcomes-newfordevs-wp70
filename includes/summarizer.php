@@ -1,4 +1,10 @@
 <?php
+/**
+ * Content Summarizer example: registers the summarization ability (PHP AI
+ * Client) and the block-editor script module that calls it from JavaScript.
+ *
+ * @package WebinarWpcomesNewfordevsWp70
+ */
 
 /**
  * Register the workshop's ability category.
@@ -100,10 +106,26 @@ function wp_ai_workshop_execute_summarization( $input ) {
 		$content
 	);
 
+	// Pin an ordered list of preferred models. Without this, the AI Client
+	// falls back to its newest default model, which an account may not have
+	// access to (e.g. it can request "Claude Fable 5" and get a 404). Each
+	// entry is a [ provider ID, model ID ] tuple; the client uses the first
+	// one whose provider is configured and model is available — so this stays
+	// provider-agnostic with graceful fallback. Mirrors the official `ai`
+	// plugin's `get_preferred_models_for_text_generation()` pattern.
+	$preferred_models = array(
+		array( 'anthropic', 'claude-sonnet-4-6' ),
+		array( 'anthropic', 'claude-opus-4-8' ),
+		array( 'openai', 'gpt-5.4-mini' ),
+		array( 'google', 'gemini-3-flash-preview' ),
+	);
+
 	// Returning the raw result is fine: a string flows through to the
 	// caller; a WP_Error is surfaced by the Abilities API as a typed REST
 	// error (e.g. `ability_invalid_output`).
-	return wp_ai_client_prompt( $prompt )->generate_text();
+	return wp_ai_client_prompt( $prompt )
+		->using_model_preference( ...$preferred_models )
+		->generate_text();
 }
 
 /**

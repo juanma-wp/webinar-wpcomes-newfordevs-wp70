@@ -47,7 +47,7 @@ For live development: `npm start` (rebuilds on change).
 
 | File | Role |
 | --- | --- |
-| `whats-new-for-devs-in-wp-70.php` | Bootstrap; bails if not on WP 7.0; loads `includes/`. |
+| `webinar-wpcomes-newfordevs-wp70.php` | Bootstrap; bails if not on WP 7.0; loads `includes/`. |
 | `includes/summarizer.php` | Registers the ability category + `wp-ai-workshop/summarization` ability (schemas, permission, `execute_callback` calling the PHP AI Client), and enqueues the editor **script module**. |
 | `src/index.js` | Editor UI; calls `executeAbility( 'wp-ai-workshop/summarization', { content, length } )` from `@wordpress/abilities`. |
 
